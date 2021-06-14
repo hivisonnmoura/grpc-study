@@ -1,5 +1,6 @@
-package com.hmoura.grpc.greeting.server;
+package com.hmoura.grpc.greet.server;
 
+import com.hmoura.grpc.greet.service.GreetServiceImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 
