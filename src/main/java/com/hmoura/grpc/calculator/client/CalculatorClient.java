@@ -12,7 +12,7 @@ public class CalculatorClient {
     public static void main(String[] args) {
         System.out.println("Hello I'm a gRPC Calculator Client");
 
-        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051).usePlaintext().build();
+        ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50052).usePlaintext().build();
 
         System.out.println("Creating stub");
 
