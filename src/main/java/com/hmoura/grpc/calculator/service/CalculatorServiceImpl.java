@@ -11,8 +11,8 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
     public void sum(SumRequest request, StreamObserver<SumResponse> responseObserver) {
 
         //Perform the sum operation
-        long result = Integer.sum(request.getCalculator().getFirstValue(),
-                request.getCalculator().getSecondValue());
+        long result = Integer.sum(request.getFirstValue(),
+                request.getSecondValue());
 
         //Creating the response
         SumResponse response = SumResponse.newBuilder().setResult(result).build();

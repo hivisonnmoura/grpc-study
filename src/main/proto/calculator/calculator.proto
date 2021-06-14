@@ -5,13 +5,10 @@ package calculator;
 option java_package = "com.proto.calculator";
 option java_multiple_files = true;
 
-message Calculator {
-  int32 first_value = 1;
-  int32 second_value = 2;
-}
 
 message SumRequest {
-  Calculator calculator = 1;
+  int32 first_value = 1;
+  int32 second_value = 2;
 }
 
 message SumResponse {

@@ -1,6 +1,5 @@
 package com.hmoura.grpc.calculator.client;
 
-import com.proto.calculator.Calculator;
 import com.proto.calculator.CalculatorServiceGrpc;
 import com.proto.calculator.SumRequest;
 import com.proto.calculator.SumResponse;
@@ -18,16 +17,14 @@ public class CalculatorClient {
 
         //Created a calculator service client (blocking -> synchronous)
         CalculatorServiceGrpc.CalculatorServiceBlockingStub calculatorClient = CalculatorServiceGrpc.newBlockingStub(channel);
-        //Created a protocol buffer calculator message
-        Calculator calculator = Calculator.newBuilder().setFirstValue(3).setSecondValue(10).build();
 
         //Do the same for a CalculatorRequest
-        SumRequest calculatorRequest = SumRequest.newBuilder().setCalculator(calculator).build();
+        SumRequest request = SumRequest.newBuilder().setFirstValue(3).setSecondValue(10).build();
 
         //Call the RPC and get back a CalculatorResponse (protocol buffers)
-        SumResponse response = calculatorClient.sum(calculatorRequest);
+        SumResponse response = calculatorClient.sum(request);
         //print the result
-        System.out.println(response.getResult());
+        System.out.println(request.getFirstValue() + " + " + request.getSecondValue() + " = " + response.getResult());
 
         //Shutdown the channel
         System.out.println("Shutting down channel");
