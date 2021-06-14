@@ -28,7 +28,7 @@ public class CalculatorClient {
         SumResponse response = calculatorClient.sum(request);
         //print the result
         System.out.println(request.getFirstValue() + " + " + request.getSecondValue() + " = " + response.getResult());
-*/
+        */
 
         //Server Streaming
         PrimeNumberDecompositionRequest request =
