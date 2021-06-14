@@ -1,6 +1,5 @@
 package com.hmoura.grpc.calculator.service;
 
-import com.proto.calculator.Calculator;
 import com.proto.calculator.CalculatorServiceGrpc;
 import com.proto.calculator.SumRequest;
 import com.proto.calculator.SumResponse;
@@ -11,13 +10,9 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
     @Override
     public void sum(SumRequest request, StreamObserver<SumResponse> responseObserver) {
 
-        //Extract the values we need
-        Calculator calculator = request.getCalculator();
-        int firstValue = calculator.getFirstValue();
-        int secondValue = calculator.getSecondValue();
-
         //Perform the sum operation
-        long result = firstValue + secondValue;
+        long result = Integer.sum(request.getCalculator().getFirstValue(),
+                request.getCalculator().getSecondValue());
 
         //Creating the response
         SumResponse response = SumResponse.newBuilder().setResult(result).build();
