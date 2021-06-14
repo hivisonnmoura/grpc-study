@@ -1,9 +1,9 @@
-package com.hmoura.grpc.greeting.client;
+package com.hmoura.grpc.calculator.client;
 
 import com.proto.calculator.Calculator;
-import com.proto.calculator.CalculatorRequest;
-import com.proto.calculator.CalculatorResponse;
 import com.proto.calculator.CalculatorServiceGrpc;
+import com.proto.calculator.SumRequest;
+import com.proto.calculator.SumResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 
@@ -22,10 +22,10 @@ public class CalculatorClient {
         Calculator calculator = Calculator.newBuilder().setFirstValue(3).setSecondValue(10).build();
 
         //Do the same for a CalculatorRequest
-        CalculatorRequest calculatorRequest = CalculatorRequest.newBuilder().setCalculator(calculator).build();
+        SumRequest calculatorRequest = SumRequest.newBuilder().setCalculator(calculator).build();
 
         //Call the RPC and get back a CalculatorResponse (protocol buffers)
-        CalculatorResponse response = calculatorClient.calculator(calculatorRequest);
+        SumResponse response = calculatorClient.sum(calculatorRequest);
         //print the result
         System.out.println(response.getResult());
 

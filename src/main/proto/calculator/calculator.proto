@@ -10,15 +10,15 @@ message Calculator {
   int32 second_value = 2;
 }
 
-message CalculatorRequest {
+message SumRequest {
   Calculator calculator = 1;
 }
 
-message CalculatorResponse {
+message SumResponse {
   int64 result = 1;
 }
 
 service CalculatorService {
   //Unary
-  rpc Calculator(CalculatorRequest) returns (CalculatorResponse) {};
+  rpc Sum(SumRequest) returns (SumResponse) {};
 }

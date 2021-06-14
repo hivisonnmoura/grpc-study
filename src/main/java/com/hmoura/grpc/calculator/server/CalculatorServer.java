@@ -1,18 +1,19 @@
-package com.hmoura.grpc.greeting.server;
+package com.hmoura.grpc.calculator.server;
 
+import com.hmoura.grpc.calculator.service.CalculatorServiceImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
 
 import java.io.IOException;
 
-public class GreetingServer {
+public class CalculatorServer {
 
     public static void main(String[] args) throws IOException, InterruptedException {
         System.out.println("Hello gRPC");
 
         Server server = ServerBuilder.forPort(50051)
-                //Register Greet Service
-                .addService(new GreetServiceImpl())
+                //Register Calculator Service
+                .addService(new CalculatorServiceImpl())
                 .build();
 
         server.start();

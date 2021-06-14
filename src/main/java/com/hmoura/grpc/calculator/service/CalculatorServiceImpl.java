@@ -1,15 +1,15 @@
-package com.hmoura.grpc.greeting.server;
+package com.hmoura.grpc.calculator.service;
 
 import com.proto.calculator.Calculator;
-import com.proto.calculator.CalculatorRequest;
-import com.proto.calculator.CalculatorResponse;
 import com.proto.calculator.CalculatorServiceGrpc;
+import com.proto.calculator.SumRequest;
+import com.proto.calculator.SumResponse;
 import io.grpc.stub.StreamObserver;
 
 public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServiceImplBase {
 
     @Override
-    public void calculator(CalculatorRequest request, StreamObserver<CalculatorResponse> responseObserver) {
+    public void sum(SumRequest request, StreamObserver<SumResponse> responseObserver) {
 
         //Extract the values we need
         Calculator calculator = request.getCalculator();
@@ -20,7 +20,7 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
         long result = firstValue + secondValue;
 
         //Creating the response
-        CalculatorResponse response = CalculatorResponse.newBuilder().setResult(result).build();
+        SumResponse response = SumResponse.newBuilder().setResult(result).build();
 
         //Send the response
         responseObserver.onNext(response);
