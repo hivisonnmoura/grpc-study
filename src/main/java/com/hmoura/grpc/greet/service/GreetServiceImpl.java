@@ -6,6 +6,8 @@ import com.proto.greet.GreetRequest;
 import com.proto.greet.GreetResponse;
 import com.proto.greet.GreetServiceGrpc;
 import com.proto.greet.Greeting;
+import com.proto.greet.LongGreetRequest;
+import com.proto.greet.LongGreetResponse;
 import io.grpc.stub.StreamObserver;
 
 import java.util.stream.IntStream;
@@ -54,5 +56,41 @@ public class GreetServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
             responseObserver.onCompleted();
         }
         responseObserver.onCompleted();
+    }
+
+    @Override
+    public StreamObserver<LongGreetRequest> longGreet(StreamObserver<LongGreetResponse> responseObserver) {
+
+        return new StreamObserver<>() {
+
+            String result = "";
+
+            //Implement how to react when we receive a new message
+            @Override
+            public void onNext(LongGreetRequest value) {
+                //Client sends a message
+                result += "Hello " + value.getGreeting().getFirstName() + " " + value.getGreeting().getLastName() + "! ";
+            }
+
+            //Implement how to react when we receive an error
+            @Override
+            public void onError(Throwable t) {
+                //Client sends an error
+            }
+
+            //Implement how to react when we the client is done
+            @Override
+            public void onCompleted() {
+                //Client is done
+                responseObserver.onNext(
+                        LongGreetResponse.newBuilder()
+                                .setResult(result)
+                                .build()
+                );
+                responseObserver.onCompleted();
+                //This is when we want to return a response (responseObserver)
+            }
+        };
+
     }
 }
