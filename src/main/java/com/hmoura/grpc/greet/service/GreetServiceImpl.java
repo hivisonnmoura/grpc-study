@@ -98,7 +98,7 @@ public class GreetServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
 
     @Override
     public StreamObserver<GreetEveryoneRequest> greetEveryone(StreamObserver<GreetEveryoneResponse> responseObserver) {
-        StreamObserver<GreetEveryoneRequest> requestObserver = new StreamObserver<>() {
+        return new StreamObserver<>() {
             @Override
             public void onNext(GreetEveryoneRequest value) {
                 String response = value.getGreeting().getFirstName() + " " + value.getGreeting().getLastName();
@@ -119,6 +119,5 @@ public class GreetServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
 
             }
         };
-        return requestObserver;
     }
 }

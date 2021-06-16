@@ -3,6 +3,8 @@ package com.hmoura.grpc.calculator.client;
 import com.proto.calculator.CalculatorServiceGrpc;
 import com.proto.calculator.ComputeAverageRequest;
 import com.proto.calculator.ComputeAverageResponse;
+import com.proto.calculator.FindMaximumRequest;
+import com.proto.calculator.FindMaximumResponse;
 import com.proto.calculator.PrimeNumberDecompositionRequest;
 import com.proto.calculator.SumRequest;
 import com.proto.calculator.SumResponse;
@@ -10,6 +12,7 @@ import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
@@ -29,11 +32,54 @@ public class CalculatorClient {
 
         //doUnaryCall(channel);
         //doServerStreamingCall(channel);
-        doClientStreamingCall(channel);
+        //doClientStreamingCall(channel);
+        doBiDirectionalStreamingCall(channel);
 
 
         System.out.println("Shutting down channel");
         channel.shutdown();
+    }
+
+    private void doBiDirectionalStreamingCall(ManagedChannel channel) {
+        CalculatorServiceGrpc.CalculatorServiceStub asyncClient = CalculatorServiceGrpc.newStub(channel);
+
+        CountDownLatch latch = new CountDownLatch(1);
+
+
+        StreamObserver<FindMaximumRequest> requestObserver = asyncClient.findMaximum(new StreamObserver<>() {
+            @Override
+            public void onNext(FindMaximumResponse value) {
+                System.out.println("Response from server: "+value.getResponse());
+            }
+
+            @Override
+            public void onError(Throwable t) { latch.countDown(); }
+
+            @Override
+            public void onCompleted() {
+                System.out.println("Server is done sending data");
+                latch.countDown();
+
+            }
+        });
+
+        Arrays.asList(1,5,3,6,2,20).forEach(
+                maxValue -> {
+                    System.out.println("Sending: "+ maxValue);
+                    requestObserver.onNext(FindMaximumRequest.newBuilder()
+                    .setValue(maxValue)
+                    .build());
+                }
+        );
+
+
+        requestObserver.onCompleted();
+
+        try {
+            latch.await(3L, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
     }
 
     private void doClientStreamingCall(ManagedChannel channel) {

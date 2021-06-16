@@ -3,6 +3,8 @@ package com.hmoura.grpc.calculator.service;
 import com.proto.calculator.CalculatorServiceGrpc;
 import com.proto.calculator.ComputeAverageRequest;
 import com.proto.calculator.ComputeAverageResponse;
+import com.proto.calculator.FindMaximumRequest;
+import com.proto.calculator.FindMaximumResponse;
 import com.proto.calculator.PrimeNumberDecompositionRequest;
 import com.proto.calculator.PrimeNumberDecompositionResponse;
 import com.proto.calculator.SumRequest;
@@ -10,6 +12,7 @@ import com.proto.calculator.SumResponse;
 import io.grpc.stub.StreamObserver;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -78,6 +81,36 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
                 );
                 responseObserver.onCompleted();
                 System.out.println("Completed request");
+            }
+        };
+    }
+
+    @Override
+    public StreamObserver<FindMaximumRequest> findMaximum(StreamObserver<FindMaximumResponse> responseObserver) {
+        return new StreamObserver<>() {
+
+            final List<Integer> listOfValues = new ArrayList<>();
+
+            @Override
+            public void onNext(FindMaximumRequest value) {
+                listOfValues.add(value.getValue());
+                responseObserver.onNext(
+                        FindMaximumResponse.newBuilder()
+                                .setResponse(
+                                        Collections.max(listOfValues, null)
+                                )
+                                .build()
+                );
+            }
+
+            @Override
+            public void onError(Throwable t) {
+
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onCompleted();
             }
         };
     }
