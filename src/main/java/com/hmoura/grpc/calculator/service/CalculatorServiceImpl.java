@@ -1,12 +1,16 @@
 package com.hmoura.grpc.calculator.service;
 
 import com.proto.calculator.CalculatorServiceGrpc;
+import com.proto.calculator.ComputeAverageRequest;
+import com.proto.calculator.ComputeAverageResponse;
 import com.proto.calculator.PrimeNumberDecompositionRequest;
 import com.proto.calculator.PrimeNumberDecompositionResponse;
 import com.proto.calculator.SumRequest;
 import com.proto.calculator.SumResponse;
 import io.grpc.stub.StreamObserver;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.stream.IntStream;
 
 public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServiceImplBase {
@@ -44,4 +48,37 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
                 .orElse(IntStream.of(num));
     }
 
+
+    @Override
+    public StreamObserver<ComputeAverageRequest> computeAverage(StreamObserver<ComputeAverageResponse> responseObserver) {
+        return new StreamObserver<>() {
+            final List<Integer> listOfValues = new ArrayList<>();
+
+            @Override
+            public void onNext(ComputeAverageRequest value) {
+                listOfValues.add(value.getValue());
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                System.err.println(t.getLocalizedMessage());
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onNext(
+                        ComputeAverageResponse.newBuilder()
+                                .setAverage(
+                                        listOfValues.stream()
+                                                .mapToDouble(d -> d)
+                                                .average()
+                                                .orElseThrow()
+                                )
+                                .build()
+                );
+                responseObserver.onCompleted();
+                System.out.println("Completed request");
+            }
+        };
+    }
 }
