@@ -89,18 +89,23 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
     public StreamObserver<FindMaximumRequest> findMaximum(StreamObserver<FindMaximumResponse> responseObserver) {
         return new StreamObserver<>() {
 
-            final List<Integer> listOfValues = new ArrayList<>();
+            int  currentMaximum = 0;
 
             @Override
             public void onNext(FindMaximumRequest value) {
-                listOfValues.add(value.getValue());
-                responseObserver.onNext(
-                        FindMaximumResponse.newBuilder()
-                                .setResponse(
-                                        Collections.max(listOfValues, null)
-                                )
-                                .build()
-                );
+                int currentNumber = value.getValue();
+
+                if(currentNumber > currentMaximum) {
+                    currentMaximum = currentNumber;
+                    responseObserver.onNext(
+                            FindMaximumResponse.newBuilder()
+                                    .setResponse(currentNumber)
+                                    .build()
+                    );
+                } else {
+                    //Nothing
+                }
+
             }
 
             @Override
