@@ -1,5 +1,7 @@
 package com.hmoura.grpc.greet.service;
 
+import com.proto.greet.GreetEveryoneRequest;
+import com.proto.greet.GreetEveryoneResponse;
 import com.proto.greet.GreetManyTimesRequest;
 import com.proto.greet.GreetManyTimesResponse;
 import com.proto.greet.GreetRequest;
@@ -92,5 +94,31 @@ public class GreetServiceImpl extends GreetServiceGrpc.GreetServiceImplBase {
             }
         };
 
+    }
+
+    @Override
+    public StreamObserver<GreetEveryoneRequest> greetEveryone(StreamObserver<GreetEveryoneResponse> responseObserver) {
+        StreamObserver<GreetEveryoneRequest> requestObserver = new StreamObserver<>() {
+            @Override
+            public void onNext(GreetEveryoneRequest value) {
+                String response = value.getGreeting().getFirstName() + " " + value.getGreeting().getLastName();
+                GreetEveryoneResponse greetEveryoneResponse = GreetEveryoneResponse.newBuilder()
+                        .setResult(response)
+                        .build();
+                responseObserver.onNext(greetEveryoneResponse);
+            }
+
+            @Override
+            public void onError(Throwable t) {
+                //TODO
+            }
+
+            @Override
+            public void onCompleted() {
+                responseObserver.onCompleted();
+
+            }
+        };
+        return requestObserver;
     }
 }
