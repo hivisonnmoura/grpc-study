@@ -12,6 +12,7 @@ import io.grpc.stub.StreamObserver;
 
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
 
 public class CalculatorClient {
 
@@ -60,21 +61,11 @@ public class CalculatorClient {
             }
         });
 
-        System.out.println("Sending message 1");
-        requestStreamObserver.onNext(ComputeAverageRequest.newBuilder()
-        .setValue(1).build());
-
-        System.out.println("Sending message 2");
-        requestStreamObserver.onNext(ComputeAverageRequest.newBuilder()
-                .setValue(2).build());
-
-        System.out.println("Sending message 3");
-        requestStreamObserver.onNext(ComputeAverageRequest.newBuilder()
-                .setValue(3).build());
-
-        System.out.println("Sending message 4");
-        requestStreamObserver.onNext(ComputeAverageRequest.newBuilder()
-                .setValue(4).build());
+        IntStream.rangeClosed(1, 10_000).forEach( i -> {
+            System.out.println("Sending message "+ i);
+            requestStreamObserver.onNext(ComputeAverageRequest.newBuilder()
+                    .setValue(i).build());
+        });
 
         requestStreamObserver.onCompleted();
         try {
