@@ -3,6 +3,7 @@ package com.hmoura.grpc.calculator.server;
 import com.hmoura.grpc.calculator.service.CalculatorServiceImpl;
 import io.grpc.Server;
 import io.grpc.ServerBuilder;
+import io.grpc.protobuf.services.ProtoReflectionService;
 
 import java.io.IOException;
 
@@ -14,6 +15,7 @@ public class CalculatorServer {
         Server server = ServerBuilder.forPort(50052)
                 //Register Calculator Service
                 .addService(new CalculatorServiceImpl())
+                .addService(ProtoReflectionService.newInstance()) //reflection
                 .build();
 
         server.start();

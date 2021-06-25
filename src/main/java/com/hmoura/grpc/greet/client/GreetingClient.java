@@ -6,37 +6,88 @@ import com.proto.greet.GreetManyTimesRequest;
 import com.proto.greet.GreetRequest;
 import com.proto.greet.GreetResponse;
 import com.proto.greet.GreetServiceGrpc;
+import com.proto.greet.GreetWithDeadlineRequest;
 import com.proto.greet.Greeting;
 import com.proto.greet.LongGreetRequest;
 import com.proto.greet.LongGreetResponse;
+import io.grpc.Deadline;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.Status;
+import io.grpc.StatusRuntimeException;
+import io.grpc.netty.shaded.io.grpc.netty.GrpcSslContexts;
+import io.grpc.netty.shaded.io.grpc.netty.NettyChannelBuilder;
 import io.grpc.stub.StreamObserver;
 
+import javax.net.ssl.SSLException;
+import java.io.File;
 import java.util.Arrays;
 import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.TimeUnit;
 
 public class GreetingClient {
 
-    public static void main(String[] args) {
+    public static void main(String[] args) throws SSLException {
         System.out.println("Hello I'm a gRPC client");
 
         GreetingClient main = new GreetingClient();
         main.run();
     }
 
-    private void run() {
+    private void run() throws SSLException {
         ManagedChannel channel = ManagedChannelBuilder.forAddress("localhost", 50051)
                 .usePlaintext().build();
+
+        //With server authentication SSL/TLS; custom CA root certificates;
+        final var securedChannel = NettyChannelBuilder.forAddress("localhost", 50051)
+                .sslContext(GrpcSslContexts.forClient().trustManager(new File("ssl/ca.crt")).build())
+                .build();
         //doUnaryCall(channel);
         //doServerStreamingCall(channel);
         //doClientStreamingCall(channel);
-        doBiDirectionalStreamingCall(channel);
+        //doBiDirectionalStreamingCall(channel);
+        //doUnaryCallWithDeadline(channel);
+
+        //Calling server using a secured channel
+        doUnaryCall(securedChannel);
 
         System.out.println("Shutting down channel");
         channel.shutdown();
 
+    }
+
+    private void doUnaryCallWithDeadline(ManagedChannel channel) {
+        final var blockingStub = GreetServiceGrpc.newBlockingStub(channel);
+
+        //first call (500 ms deadline)
+        try {
+            System.out.println("Sending a request with a deadline of 3000 ms");
+            final var response = blockingStub.withDeadline(Deadline.after(3000, TimeUnit.MILLISECONDS)).greetWithDeadline(GreetWithDeadlineRequest.newBuilder()
+                    .setGreeting(Greeting.newBuilder().setFirstName("Hivison").getDefaultInstanceForType())
+                    .build());
+            System.out.println(response);
+        } catch (StatusRuntimeException ex) {
+            if (ex.getStatus() == Status.DEADLINE_EXCEEDED) {
+                System.out.println("deadline has been exceeded, we don't want the response");
+            } else {
+                ex.printStackTrace();
+            }
+        }
+
+        //second call (100 ms deadline)
+        try {
+            System.out.println("Sending a request with a deadline of 100 ms");
+            final var response = blockingStub.withDeadline(Deadline.after(100, TimeUnit.MILLISECONDS)).greetWithDeadline(GreetWithDeadlineRequest.newBuilder()
+                    .setGreeting(Greeting.newBuilder().setFirstName("Hivison").getDefaultInstanceForType())
+                    .build());
+            System.out.println(response);
+        } catch (StatusRuntimeException ex) {
+            if (ex.getStatus() == Status.DEADLINE_EXCEEDED) {
+                System.out.println("deadline has been exceeded, we don't want the response");
+            } else {
+                ex.printStackTrace();
+            }
+        }
     }
 
     private void doBiDirectionalStreamingCall(ManagedChannel channel) {
@@ -47,7 +98,7 @@ public class GreetingClient {
         StreamObserver<GreetEveryoneRequest> requestObserver = asyncClient.greetEveryone(new StreamObserver<>() {
             @Override
             public void onNext(GreetEveryoneResponse value) {
-                System.out.println("Response from server: "+ value.getResult());
+                System.out.println("Response from server: " + value.getResult());
             }
 
             @Override

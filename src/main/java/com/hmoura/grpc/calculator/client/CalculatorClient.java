@@ -6,10 +6,12 @@ import com.proto.calculator.ComputeAverageResponse;
 import com.proto.calculator.FindMaximumRequest;
 import com.proto.calculator.FindMaximumResponse;
 import com.proto.calculator.PrimeNumberDecompositionRequest;
+import com.proto.calculator.SquareRootRequest;
 import com.proto.calculator.SumRequest;
 import com.proto.calculator.SumResponse;
 import io.grpc.ManagedChannel;
 import io.grpc.ManagedChannelBuilder;
+import io.grpc.StatusRuntimeException;
 import io.grpc.stub.StreamObserver;
 
 import java.util.Arrays;
@@ -33,11 +35,26 @@ public class CalculatorClient {
         //doUnaryCall(channel);
         //doServerStreamingCall(channel);
         //doClientStreamingCall(channel);
-        doBiDirectionalStreamingCall(channel);
+        //doBiDirectionalStreamingCall(channel);
+        doSquareErrorCall(channel);
 
 
         System.out.println("Shutting down channel");
         channel.shutdown();
+    }
+
+    private void doSquareErrorCall(ManagedChannel channel) {
+        CalculatorServiceGrpc.CalculatorServiceBlockingStub blockingStub = CalculatorServiceGrpc.newBlockingStub(channel);
+
+        try {
+            blockingStub.squareRoot(
+                    SquareRootRequest.newBuilder()
+                            .setNumber(-1).build());
+        } catch (StatusRuntimeException ex) {
+            System.out.println("Got an exception for square root!");
+            ex.printStackTrace();
+        }
+
     }
 
     private void doBiDirectionalStreamingCall(ManagedChannel channel) {

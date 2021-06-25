@@ -7,12 +7,14 @@ import com.proto.calculator.FindMaximumRequest;
 import com.proto.calculator.FindMaximumResponse;
 import com.proto.calculator.PrimeNumberDecompositionRequest;
 import com.proto.calculator.PrimeNumberDecompositionResponse;
+import com.proto.calculator.SquareRootRequest;
+import com.proto.calculator.SquareRootResponse;
 import com.proto.calculator.SumRequest;
 import com.proto.calculator.SumResponse;
+import io.grpc.Status;
 import io.grpc.stub.StreamObserver;
 
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.stream.IntStream;
 
@@ -89,13 +91,13 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
     public StreamObserver<FindMaximumRequest> findMaximum(StreamObserver<FindMaximumResponse> responseObserver) {
         return new StreamObserver<>() {
 
-            int  currentMaximum = 0;
+            int currentMaximum = 0;
 
             @Override
             public void onNext(FindMaximumRequest value) {
                 int currentNumber = value.getValue();
 
-                if(currentNumber > currentMaximum) {
+                if (currentNumber > currentMaximum) {
                     currentMaximum = currentNumber;
                     responseObserver.onNext(
                             FindMaximumResponse.newBuilder()
@@ -118,5 +120,27 @@ public class CalculatorServiceImpl extends CalculatorServiceGrpc.CalculatorServi
                 responseObserver.onCompleted();
             }
         };
+    }
+
+    @Override
+    public void squareRoot(SquareRootRequest request, StreamObserver<SquareRootResponse> responseObserver) {
+        int number = request.getNumber();
+
+        if (number >= 0) {
+            responseObserver.onNext(
+                    SquareRootResponse.newBuilder()
+                            .setNumberRoot(Math.sqrt(number))
+                            .build()
+            );
+            responseObserver.onCompleted();
+        } else {
+            responseObserver.onError(
+                    Status.INVALID_ARGUMENT
+                            .withDescription("The number being sent is not  positive")
+                            .augmentDescription("Number sent: " + number)
+                            .asRuntimeException()
+            );
+
+        }
     }
 }
